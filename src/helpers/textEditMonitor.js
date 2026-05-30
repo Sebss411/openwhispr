@@ -21,6 +21,40 @@ const MACOS_AX_ENABLE_SCRIPT = (pid) =>
   `\tend try\n` +
   `end tell`;
 
+// AppleScript that reads the character immediately before the cursor in the
+// focused text field. Output protocol:
+//   "OK:X"   — preceding char is X (single character, may be multibyte)
+//   "START:" — cursor is at position 0 / field is empty (no preceding char)
+//   ""       — unknown (no focused element, no range support, AX read failed)
+//
+// Caller uses "unknown" as the signal to fall back to append-mode spacing.
+// AppleScript's `character N` is 1-indexed, AXSelectedTextRange.location is
+// 0-indexed, so the char at 0-indexed offset (loc-1) is `character loc` here.
+const MACOS_AX_PRECEDING_CHAR_SCRIPT = (pid) =>
+  `tell application "System Events"\n` +
+  `\tset targetProc to first application process whose unix id is ${pid}\n` +
+  `\tset focAttr to value of attribute "AXFocusedUIElement" of targetProc\n` +
+  `\tif focAttr is missing value then return ""\n` +
+  `\tset theVal to ""\n` +
+  `\ttry\n` +
+  `\t\tset theVal to value of attribute "AXValue" of focAttr\n` +
+  `\t\tif theVal is missing value then set theVal to ""\n` +
+  `\tend try\n` +
+  `\tset loc to -1\n` +
+  `\ttry\n` +
+  `\t\tset sel to value of attribute "AXSelectedTextRange" of focAttr\n` +
+  `\t\ttry\n` +
+  `\t\t\tset loc to item 1 of sel\n` +
+  `\t\tend try\n` +
+  `\tend try\n` +
+  `\tif loc is -1 then return ""\n` +
+  `\tif loc < 1 then return "START:"\n` +
+  `\tif (length of theVal) is 0 then return "START:"\n` +
+  `\tif loc > (length of theVal) then set loc to length of theVal\n` +
+  `\tif loc < 1 then return "START:"\n` +
+  `\treturn "OK:" & (character loc of theVal)\n` +
+  `end tell`;
+
 // AppleScript to read the focused text field value from a specific app by PID.
 // Using PID avoids the problem where the Electron overlay is "frontmost".
 // Tries AXValue first, then falls back to AXStringForRange for apps that
@@ -101,6 +135,56 @@ class TextEditMonitor extends EventEmitter {
           resolve(ok);
         }
       );
+    });
+  }
+
+  /**
+   * macOS: read the character immediately before the cursor in the focused
+   * text field. Used by paste-time smart spacing to decide whether to
+   * prepend a space. Tight 400ms timeout to avoid stalling the paste.
+   *
+   * Resolves to one of:
+   *   { state: "ok", char: string }   — preceding char available
+   *   { state: "start" }              — cursor at field start (no leading space)
+   *   { state: "unknown" }            — couldn't read (non-mac, no PID, no AX
+   *                                     access, query timed out, no focused
+   *                                     text element). Caller should fall back
+   *                                     to append-mode spacing.
+   */
+  getPrecedingChar(pid, timeoutMs = 400) {
+    return new Promise((resolve) => {
+      if (process.platform !== "darwin" || !pid) {
+        resolve({ state: "unknown" });
+        return;
+      }
+      const script = MACOS_AX_PRECEDING_CHAR_SCRIPT(pid);
+      execFile("osascript", ["-e", script], { timeout: timeoutMs }, (err, stdout) => {
+        if (err) {
+          debugLogger.debug("[TextEditMonitor] getPrecedingChar failed", {
+            pid,
+            error: err.message,
+          });
+          resolve({ state: "unknown" });
+          return;
+        }
+        const out = stdout.replace(/\n$/, "");
+        if (out === "START:") {
+          resolve({ state: "start" });
+          return;
+        }
+        if (out.startsWith("OK:")) {
+          const char = out.slice(3);
+          // Defensive: AppleScript can occasionally return an empty char if
+          // the field contains a single newline/control. Treat as unknown.
+          if (char.length === 0) {
+            resolve({ state: "unknown" });
+            return;
+          }
+          resolve({ state: "ok", char });
+          return;
+        }
+        resolve({ state: "unknown" });
+      });
     });
   }
 

@@ -15,6 +15,7 @@ const OpenAIRealtimeStreaming = require("./openaiRealtimeStreaming");
 const AudioStorageManager = require("./audioStorage");
 const liveSpeakerIdentifier = require("./liveSpeakerIdentifier");
 const MeetingEchoLeakDetector = require("./meetingEchoLeakDetector");
+const { applySmartSpacing } = require("./smartSpacing");
 const {
   transcriptsOverlap,
   transcriptsLooselyOverlap,
@@ -1465,7 +1466,41 @@ class IPCHandlers {
           await new Promise((resolve) => setTimeout(resolve, 80));
         }
       }
-      const result = await this.clipboardManager.pasteText(text, {
+
+      // Smart spacing: insert a separator between previously-typed text and the
+      // new transcription so users don't have to dictate or type one manually
+      // (#856). macOS reads the preceding char via Accessibility; Windows/Linux
+      // (and macOS when the AX read fails) fall back to appending a trailing
+      // space — slightly less precise but works without an a11y bridge.
+      let textToPaste = text;
+      try {
+        if (typeof text === "string" && text.length > 0) {
+          let mode = "append";
+          let precedingChar;
+          if (process.platform === "darwin" && activated && this.textEditMonitor) {
+            const result = await this.textEditMonitor.getPrecedingChar(targetPid);
+            if (result.state === "ok") {
+              mode = "prepend";
+              precedingChar = result.char;
+            } else if (result.state === "start") {
+              mode = "prepend";
+              precedingChar = "";
+            }
+            debugLogger.debug("[SmartSpacing] Preceding-char read", {
+              targetPid,
+              state: result.state,
+              mode,
+            });
+          }
+          textToPaste = applySmartSpacing({ text, mode, precedingChar });
+        }
+      } catch (err) {
+        // Never let smart spacing break a paste — fall back to the raw text.
+        debugLogger.debug("[SmartSpacing] Failed, pasting raw", { error: err.message });
+        textToPaste = text;
+      }
+
+      const result = await this.clipboardManager.pasteText(textToPaste, {
         ...options,
         webContents: event.sender,
       });
