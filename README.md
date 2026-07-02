@@ -60,6 +60,20 @@ npm run dev
 
 Requires Node.js 24+. See the [full documentation](https://docs.openwhispr.com/quickstart) for setup guides, platform-specific instructions, and build details.
 
+### Windows setup (from source)
+
+1. Install [Node.js 24](https://nodejs.org) (check with `node -v`).
+2. `npm install` — native modules (better-sqlite3, onnxruntime) build automatically.
+3. `npm run setup:local` — downloads the whisper.cpp server binary and the `base` Whisper model, everything offline dictation needs. Other models: `npm run download:local-model -- --model small` (see `--list`).
+4. `npm run dev` — the `predev` step downloads the remaining local binaries (Qdrant, embedding model, VAD model) on first run.
+5. Optional Windows helpers for push-to-talk and fast paste: `npm run download:windows-key-listener`, `npm run download:windows-fast-paste`, `npm run download:nircmd`.
+6. Pick **Local** mode in onboarding (the default) — no account or API key needed; audio never leaves your machine.
+7. To build an unsigned installer: `npm run prebuild:win && npm run pack`.
+
+With no cleanup LLM configured, dictation still gets offline rule-based cleanup (filler removal, stutter collapsing, punctuation) and local voice commands — see [docs/local-text-pipeline.md](docs/local-text-pipeline.md). Toggle **Settings → AI Models → cleanup** off for raw transcripts.
+
+If transcription or the hotkey misbehaves, see [TROUBLESHOOTING.md](TROUBLESHOOTING.md) (microphone permissions, global hotkey, local model issues).
+
 ## Documentation
 
 Visit **[docs.openwhispr.com](https://docs.openwhispr.com)** for:

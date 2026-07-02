@@ -1254,7 +1254,7 @@ registerProcessor("pcm-streaming-processor", PCMStreamingProcessor);
       logger.logReasoning("REASONING_SKIPPED", {
         reason: "No cleanup or dictation-agent model available",
       });
-      return normalizedText;
+      return await this.applyLocalTextPipeline(normalizedText);
     }
 
     const useReasoning = await this.isReasoningAvailable();
@@ -1274,7 +1274,13 @@ registerProcessor("pcm-streaming-processor", PCMStreamingProcessor);
           agentName,
           this.voiceAgentRequested
         );
-        if (route.kind === "skip") return normalizedText;
+        if (route.kind === "skip") {
+          // Voice-agent recordings must stay raw when the agent is unreachable;
+          // any other skip gets the offline rule-based cleanup.
+          return this.voiceAgentRequested
+            ? normalizedText
+            : await this.applyLocalTextPipeline(normalizedText);
+        }
 
         const targetModel = route.kind === "agent" ? route.model : cleanupModel;
         const reasoningConfig = route.config;
@@ -1315,7 +1321,40 @@ registerProcessor("pcm-streaming-processor", PCMStreamingProcessor);
       reason: useReasoning ? "Reasoning failed" : "Reasoning not enabled",
     });
 
-    return normalizedText;
+    return await this.applyLocalTextPipeline(normalizedText);
+  }
+
+  // Offline text pipeline (dictionary corrections, rule-based cleanup, voice
+  // commands, optional local Ollama). Runs when no cleanup/agent LLM handled
+  // the transcript. Cleanup toggle off = raw transcript mode. Any failure
+  // returns the raw transcript.
+  async applyLocalTextPipeline(text) {
+    const settings = getSettings();
+    if (!settings.useCleanupModel) return text;
+    try {
+      const { processTranscriptLocally } = await import("../services/localtext/index.js");
+      const result = await processTranscriptLocally(text, {
+        language: getBaseLanguageCode(settings.preferredLanguage),
+        dictionaryEntries: settings.customDictionary,
+        ollamaModel:
+          typeof window !== "undefined" && window.localStorage
+            ? localStorage.getItem("ollamaModel") || undefined
+            : undefined,
+      });
+      logger.logReasoning("LOCAL_TEXT_PIPELINE", {
+        command: result.command,
+        usedOllama: result.usedOllama,
+        needsLLM: result.needsLLM === true,
+        inputLength: text.length,
+        outputLength: result.text?.length ?? 0,
+      });
+      return result.text || text;
+    } catch (error) {
+      logger.warn("Local text pipeline failed; returning raw transcript", {
+        error: error.message,
+      });
+      return text;
+    }
   }
 
   shouldStreamTranscription(model, provider) {

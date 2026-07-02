@@ -31,8 +31,9 @@ export const useAudioRecording = (toast, options = {}) => {
 
       audioManagerRef.current.setVoiceAgentRequested(voiceAgentRequested);
 
-      // Retry STT config fetch if it wasn't loaded on mount (e.g. auth wasn't ready)
-      if (!audioManagerRef.current.sttConfig) {
+      // Retry STT config fetch if it wasn't loaded on mount (e.g. auth wasn't ready).
+      // Local mode never needs the cloud STT config.
+      if (!audioManagerRef.current.sttConfig && !getSettings().useLocalWhisper) {
         const config = await window.electronAPI.getSttConfig?.();
         if (config?.success) {
           audioManagerRef.current.setSttConfig(config);
@@ -195,14 +196,18 @@ export const useAudioRecording = (toast, options = {}) => {
     });
 
     audioManagerRef.current.setContext("dictation");
-    window.electronAPI.getSttConfig?.().then((config) => {
-      if (config?.success && audioManagerRef.current) {
-        audioManagerRef.current.setSttConfig(config);
-        if (audioManagerRef.current.shouldUseStreaming()) {
-          audioManagerRef.current.warmupStreamingConnection();
+    // Cloud STT config is only relevant outside local mode; skip the IPC round-trip
+    // (and the resulting "API URL not configured" noise) on local-only installs.
+    if (!getSettings().useLocalWhisper) {
+      window.electronAPI.getSttConfig?.().then((config) => {
+        if (config?.success && audioManagerRef.current) {
+          audioManagerRef.current.setSttConfig(config);
+          if (audioManagerRef.current.shouldUseStreaming()) {
+            audioManagerRef.current.warmupStreamingConnection();
+          }
         }
-      }
-    });
+      });
+    }
 
     const handleToggle = async ({ voiceAgentRequested = false } = {}) => {
       if (!audioManagerRef.current) return;

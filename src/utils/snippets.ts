@@ -1,3 +1,5 @@
+import { parseDictionaryEntries } from "../services/localtext/personalDictionary.js";
+
 export interface Snippet {
   trigger: string;
   replacement: string;
@@ -55,6 +57,9 @@ export function getDictionaryHintWords(settings: {
   customDictionary: string[];
   snippets: Snippet[];
 }): string[] {
-  if (settings.snippets.length === 0) return settings.customDictionary;
-  return [...settings.customDictionary, ...settings.snippets.map((s) => s.trigger)];
+  // Correction entries ("misheard => correct") should hint the *correct* form
+  // to the transcription engine, not the whole raw entry.
+  const { hintWords } = parseDictionaryEntries(settings.customDictionary);
+  if (settings.snippets.length === 0) return hintWords;
+  return [...hintWords, ...settings.snippets.map((s) => s.trigger)];
 }

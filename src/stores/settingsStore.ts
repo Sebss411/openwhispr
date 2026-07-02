@@ -209,6 +209,20 @@ function migrateProviderSettings() {
   const useLocal = localStorage.getItem("useLocalWhisper") === "true";
   const provider = localStorage.getItem("cloudTranscriptionProvider");
 
+  // Fresh install: no legacy provider state to migrate. Skip the derive+write
+  // so the store's local-first defaults apply instead of stamping cloud mode.
+  const hasLegacyState =
+    localStorage.getItem("useLocalWhisper") !== null ||
+    cloudMode !== null ||
+    provider !== null ||
+    localStorage.getItem("cloudReasoningMode") !== null ||
+    localStorage.getItem("reasoningProvider") !== null ||
+    localStorage.getItem("hasCompletedOnboarding") !== null;
+  if (!hasLegacyState) {
+    localStorage.setItem("_providerSettingsMigrated", "1");
+    return;
+  }
+
   const transcriptionMode = deriveTranscriptionMode(useLocal, cloudMode, provider);
   localStorage.setItem("transcriptionMode", transcriptionMode);
 
@@ -830,7 +844,7 @@ function invalidateApiKeyCaches(
 
 export const useSettingsStore = create<SettingsState>()((set, get) => ({
   uiLanguage: normalizeUiLanguage(isBrowser ? localStorage.getItem("uiLanguage") : null),
-  useLocalWhisper: readBoolean("useLocalWhisper", false),
+  useLocalWhisper: readBoolean("useLocalWhisper", true),
   whisperModel: readString("whisperModel", "base"),
   localTranscriptionProvider: (readString("localTranscriptionProvider", "whisper") === "nvidia"
     ? "nvidia"
@@ -988,9 +1002,9 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
   isSignedIn: readBoolean("isSignedIn", false),
 
   transcriptionMode: (() => {
-    const v = readString("transcriptionMode", "openwhispr");
+    const v = readString("transcriptionMode", "local");
     if (v === "openwhispr" || v === "providers" || v === "local" || v === "self-hosted") return v;
-    return "openwhispr" as InferenceMode;
+    return "local" as InferenceMode;
   })(),
   remoteTranscriptionType: (() => {
     const v = readString("remoteTranscriptionType", "lan");

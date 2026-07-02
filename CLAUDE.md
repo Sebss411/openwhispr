@@ -147,6 +147,17 @@ OpenWhispr is an Electron-based desktop dictation application that uses whisper.
   - Per-scope LLM config: 4 scopes (`dictationCleanup`, `dictationAgent`, `noteFormatting`, `chatIntelligence`) defined in `src/config/inferenceScopes.ts`
   - `selectResolvedLLMConfig(state, scope)` in `settingsStore.ts` resolves provider/model per scope with fallback chains
 
+### Local Text Pipeline (src/services/localtext/)
+
+Offline, rule-based transcript processing used when no cleanup/agent LLM handles a dictation (see `audioManager.applyLocalTextPipeline`). Pure ES modules with zero Electron/DOM deps (portable to mobile). Docs: `docs/local-text-pipeline.md`.
+
+- **localCleanup.js**: filler removal (es/en), stutter collapsing, spacing/punctuation normalization
+- **voiceCommands.js**: leading/trailing command detection ("formato email: …", "… hazlo más corto") + deterministic rule transforms
+- **personalDictionary.js**: parses Settings → Dictionary entries; `misheard => correct` entries become post-transcription rewrites (and hint the corrected form to Whisper via `getDictionaryHintWords`)
+- **ollamaClient.js**: optional local Ollama (127.0.0.1:11434) for generation-type commands; cached probe, silent rule fallback, never required
+- Raw transcript mode = cleanup toggle off (`useCleanupModel`)
+- Tests: `node --test test/services/localtext.test.js`
+
 ### whisper.cpp Integration
 
 - **whisper.js**: Native binary wrapper for local transcription

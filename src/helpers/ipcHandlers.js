@@ -6300,7 +6300,11 @@ class IPCHandlers {
     ipcMain.handle("get-stt-config", async (event) => {
       try {
         const apiUrl = getApiUrl();
-        if (!apiUrl) throw new Error("OpenWhispr API URL not configured");
+        if (!apiUrl) {
+          // Local-only install: no OpenWhispr Cloud configured, STT config doesn't apply
+          debugLogger.debug("get-stt-config skipped: no OpenWhispr API URL (local mode)");
+          return null;
+        }
 
         const authHeader = await getAuthHeader(event);
         if (!Object.keys(authHeader).length) throw new Error("Not authenticated");
@@ -6330,7 +6334,10 @@ class IPCHandlers {
     ipcMain.handle("get-note-recording-config", async (event) => {
       try {
         const apiUrl = getApiUrl();
-        if (!apiUrl) throw new Error("OpenWhispr API URL not configured");
+        if (!apiUrl) {
+          debugLogger.debug("get-note-recording-config skipped: no OpenWhispr API URL (local mode)");
+          return null;
+        }
 
         const authHeader = await getAuthHeader(event);
         if (!Object.keys(authHeader).length) throw new Error("Not authenticated");

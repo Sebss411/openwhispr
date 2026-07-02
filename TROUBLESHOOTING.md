@@ -67,6 +67,25 @@
 4. Try a different hotkey
 5. Re-run onboarding
 
+### Global Hotkey Not Working
+
+**Symptoms:** Pressing the hotkey does nothing, or recording never starts/stops
+
+**Causes:**
+
+- Another app already registered the same global shortcut
+- The hotkey was changed but registration failed silently
+- **Windows:** the focused window runs elevated (as administrator) — low-level keyboard hooks from a non-elevated OpenWhispr can't see keystrokes there
+- **Windows:** `windows-key-listener.exe` missing (push-to-talk falls back to tap mode)
+
+**Fix:**
+
+1. Change the hotkey in Settings → Hotkeys — the app warns if registration fails; `F8` is a reliable fallback
+2. Close apps known to grab global shortcuts (screen recorders, game overlays, other dictation tools) and retry
+3. **Windows:** if you dictate into elevated apps, run OpenWhispr as administrator too
+4. **Windows:** if running from source, download the key listener: `npm run download:windows-key-listener`
+5. **Linux (GNOME/Hyprland Wayland):** hotkeys register through the compositor — check GNOME Settings → Keyboard → Shortcuts → Custom, and see the Wayland notes below
+
 ### FFmpeg Not Found
 
 **Symptoms:** "FFmpeg not found" error, transcription fails immediately
