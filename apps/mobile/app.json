@@ -1,0 +1,29 @@
+{
+  "expo": {
+    "name": "OpenWhispr Mobile",
+    "slug": "openwhispr-mobile",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": false,
+      "infoPlist": {
+        "NSMicrophoneUsageDescription": "Dictation is recorded locally and transcribed on your own computer over your home network. Audio never leaves your devices."
+      }
+    },
+    "android": {
+      "package": "com.openwhispr.mobile",
+      "permissions": ["android.permission.RECORD_AUDIO"],
+      "usesCleartextTraffic": true
+    },
+    "plugins": [
+      [
+        "expo-audio",
+        {
+          "microphonePermission": "Allow OpenWhispr to record dictation. Audio is transcribed on your own computer and never leaves your devices."
+        }
+      ]
+    ]
+  }
+}

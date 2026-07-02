@@ -1,0 +1,25 @@
+{
+  "name": "openwhispr-mobile",
+  "version": "0.1.0",
+  "private": true,
+  "main": "node_modules/expo/AppEntry.js",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios"
+  },
+  "dependencies": {
+    "expo": "~54.0.0",
+    "expo-audio": "*",
+    "expo-clipboard": "*",
+    "expo-file-system": "*",
+    "expo-sqlite": "*",
+    "expo-status-bar": "*",
+    "react": "*",
+    "react-native": "*"
+  },
+  "devDependencies": {
+    "@types/react": "*",
+    "typescript": "*"
+  }
+}

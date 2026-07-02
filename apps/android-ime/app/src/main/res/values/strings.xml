@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="key_record">🎙 Dictate</string>
+    <string name="key_stop">■ Stop</string>
+    <string name="status_idle">OpenWhispr — tap to dictate</string>
+    <string name="status_recording">Recording… tap to stop</string>
+    <string name="status_transcribing">Transcribing on your computer…</string>
+    <string name="status_empty">No speech detected</string>
+    <string name="status_need_permission">Open OpenWhispr Keyboard app once to grant mic permission</string>
+    <string name="status_need_server">Set server URL in the OpenWhispr Keyboard app</string>
+    <string name="settings_server">Bridge server URL (npm run serve:mobile)</string>
+    <string name="settings_token">Token (only if bridge uses --token)</string>
+    <string name="settings_language">Language (auto, es, en, …)</string>
+    <string name="settings_save">Save</string>
+    <string name="settings_enable_ime">Enable keyboard in system settings</string>
+</resources>

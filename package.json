@@ -49,6 +49,7 @@
     "predist": "npm run compile:native && npm run download:whisper-cpp && npm run download:llama-server && npm run download:sherpa-onnx && npm run download:qdrant && npm run download:meeting-aec-helper && npm run download:whisper-vad-model && npm run download:diarization-models -- --output-dir resources/bin/diarization-models",
     "dist": "npm run build:renderer && electron-builder",
     "setup:local": "npm run download:local-whisper && npm run download:local-model",
+    "serve:mobile": "node scripts/mobile-whisper-server.js",
     "download:local-whisper": "node scripts/download-whisper-cpp.js --current",
     "download:local-model": "node scripts/download-whisper-model.js",
     "download:whisper-cpp": "node scripts/download-whisper-cpp.js --current",

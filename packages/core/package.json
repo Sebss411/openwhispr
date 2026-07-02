@@ -1,0 +1,13 @@
+{
+  "name": "@openwhispr/core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Shared platform-agnostic core: transcript cleanup, voice commands, personal dictionary, and data schemas. Consumed in-repo (Metro alias / relative import); the canonical cleanup code lives in src/services/localtext.",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./schema/transcriptions.sql": "./schema/transcriptions.sql",
+    "./schema/settings.schema.json": "./schema/settings.schema.json"
+  }
+}

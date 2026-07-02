@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "OpenWhispr shared settings",
+  "description": "Settings shared between desktop and mobile. Desktop persists them in localStorage under the same key names (see CLAUDE.md §5); mobile persists them as a JSON document.",
+  "type": "object",
+  "properties": {
+    "preferredLanguage": {
+      "type": "string",
+      "description": "Two-letter language code or \"auto\"",
+      "default": "auto"
+    },
+    "whisperModel": {
+      "type": "string",
+      "description": "Whisper model name from modelRegistryData.json whisperModels",
+      "default": "base"
+    },
+    "useCleanupModel": {
+      "type": "boolean",
+      "description": "Cleanup on/off. Off = raw transcript mode",
+      "default": true
+    },
+    "saveHistory": {
+      "type": "boolean",
+      "description": "Persist transcriptions to the local history table",
+      "default": true
+    },
+    "customDictionary": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Hint words; entries formatted \"misheard => correct\" are also post-transcription corrections",
+      "default": []
+    },
+    "transcriptionServerUrl": {
+      "type": "string",
+      "description": "Mobile only: URL of the LAN transcription bridge (scripts/mobile-whisper-server.js on the desktop), e.g. http://192.168.1.50:8380",
+      "default": ""
+    }
+  }
+}

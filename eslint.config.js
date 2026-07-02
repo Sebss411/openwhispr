@@ -10,6 +10,8 @@ module.exports = [
       "*.min.js",
       "build/**",
       "src/**", // src has its own config
+      "apps/**", // sub-projects (Expo, Android) with their own toolchains
+      "packages/**", // shared ESM core, linted via src's config through re-exported sources
     ],
   },
   // Main process files (CommonJS)

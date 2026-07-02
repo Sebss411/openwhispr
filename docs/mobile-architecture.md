@@ -1,6 +1,15 @@
 # Mobile Architecture Plan
 
-Goal: a private, local-first mobile companion to the desktop app — record, transcribe, clean, share — without cloud, accounts, or subscriptions. This is a plan; nothing here blocks or changes the desktop app.
+Goal: a private, local-first mobile companion to the desktop app — record, transcribe, clean, share — without cloud, accounts, or subscriptions. Nothing here blocks or changes the desktop app.
+
+> **Status update (July 2026)**: batches 4–6 are now implemented in-repo (uncommitted):
+>
+> - `packages/core/` — shared core (re-exports `src/services/localtext` + history/settings schemas)
+> - `scripts/mobile-whisper-server.js` (`npm run serve:mobile`) — LAN transcription bridge reusing the desktop's whisper-server binary and models, with ffmpeg conversion and optional server-side cleanup (`?clean=1`). **Tested end-to-end on this machine.**
+> - `apps/mobile/` — Expo MVP (record → bridge → shared cleanup → clipboard/share → SQLite history). Scaffold complete, not yet run on a device.
+> - `apps/android-ime/` — Kotlin voice keyboard (dictate into any app via the bridge). Code complete, not yet compiled (no Android SDK on this machine).
+>
+> The sections below remain the reference design.
 
 ## What is already shareable today
 
@@ -48,9 +57,19 @@ No accounts, no push, no analytics. Estimated scope: small — the hard parts (c
 
 ## Mobile advanced (batch 6)
 
-- **iOS custom keyboard** (App Extension): keyboards have a ~60–70 MB memory ceiling — only tiny (~75 MB mmap'd, borderline) fits; the pragmatic pattern is the keyboard records and hands off to the main app via App Group, or hits the LAN whisper-server. Requires "Allow Full Access" for network/mic.
-- **Android IME** (`InputMethodService`): fewer restrictions; can run whisper.cpp tiny/base in-process and type results directly into any app. This is the closest to desktop "dictate anywhere" and should come first.
-- Both reuse `@openwhispr/core` via a JS runtime (Hermes) or a thin native port of the cleanup rules if running outside RN.
+- **Android IME** (`InputMethodService`): fewer restrictions; implemented in `apps/android-ime/` against the LAN bridge (cleanup runs server-side via `?clean=1`, so no JS runtime on the phone). On-device whisper.cpp tiny/base in-process is the offline upgrade path.
+- **iOS custom keyboard** (App Extension): see decision below.
+
+## iOS keyboard — decision (batch 7): deferred
+
+Assessment: **it does not pay off right now.** Reasons, in order of weight:
+
+1. **No build environment**: requires macOS + Xcode + an Apple Developer setup; none available on this Windows machine, so anything written here would be unverifiable Swift.
+2. **Personal-use friction**: without a paid developer account, sideloaded builds expire every 7 days; with one, it's $99/year — against the whole point of this project (zero recurring cost).
+3. **Platform ceiling**: keyboard extensions get ~60–70 MB RAM (rules out on-device whisper beyond tiny), need "Allow Full Access" for network, and cannot record audio directly in many configurations — the standard workaround (hand off to the host app via App Group, come back for the text) is a materially worse UX than the Android IME.
+4. **Coverage exists**: the Expo MVP runs on iOS via Expo Go — record → transcribe → auto-copy → paste covers ~80% of the keyboard use case on iOS today.
+
+Revisit when: a Mac is available AND the Android IME has proven the bridge workflow day-to-day. The right shape then is a keyboard extension that POSTs to the same bridge (`?clean=1`), sharing `packages/core` schemas — roughly the iOS twin of `apps/android-ime`.
 
 ## Non-goals
 
