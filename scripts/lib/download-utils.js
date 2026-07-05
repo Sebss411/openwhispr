@@ -2,6 +2,7 @@ const https = require("https");
 const fs = require("fs");
 const path = require("path");
 const { execSync } = require("child_process");
+const { resolveDownloadPlan } = require("./asset-source");
 
 const REQUEST_TIMEOUT = 30000;
 const MAX_RETRIES = 3;
@@ -141,7 +142,40 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-function downloadFile(url, dest, retryCount = 0) {
+// Public download entry point. Routes every asset through the Private Flow
+// forever-build resolver (offline bundle → private release → gated upstream)
+// before hitting the network. See scripts/lib/asset-source.js.
+async function downloadFile(url, dest) {
+  const plan = resolveDownloadPlan(url); // throws PRIVATE_FLOW_ASSET_MISSING when blocked
+
+  if (plan.localPath) {
+    fs.mkdirSync(path.dirname(dest), { recursive: true });
+    fs.copyFileSync(plan.localPath, dest);
+    console.log(`  [offline-bundle] ${path.basename(dest)} ← ${plan.localPath}`);
+    return;
+  }
+
+  let lastError = null;
+  for (const candidate of plan.urls) {
+    try {
+      if (candidate.source !== "upstream") {
+        console.log(`  [asset-source:${candidate.source}] ${candidate.url}`);
+      }
+      await _downloadFromUrl(candidate.url, dest);
+      return;
+    } catch (error) {
+      lastError = error;
+      if (plan.urls.length > 1) {
+        console.warn(
+          `  [asset-source] ${candidate.source} failed (${error.message}); trying next source…`
+        );
+      }
+    }
+  }
+  throw lastError || new Error(`Failed to download ${url}`);
+}
+
+function _downloadFromUrl(url, dest, retryCount = 0) {
   return new Promise((resolve, reject) => {
     const file = fs.createWriteStream(dest);
     let activeRequest = null;
@@ -233,7 +267,7 @@ function downloadFile(url, dest, retryCount = 0) {
       if (fs.existsSync(dest)) {
         fs.unlinkSync(dest);
       }
-      return downloadFile(url, dest, retryCount + 1);
+      return _downloadFromUrl(url, dest, retryCount + 1);
     }
     throw error;
   });

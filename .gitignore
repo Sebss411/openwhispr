@@ -193,6 +193,9 @@ resources/bin/
 native/meeting-aec-helper/build/
 native/meeting-aec-helper/third_party/
 
+# Private Flow offline bundle (local build artifacts — binaries + models, never committed)
+artifacts/
+
 # macOS
 .DS_Store
 .AppleDouble

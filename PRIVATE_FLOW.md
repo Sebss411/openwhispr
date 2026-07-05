@@ -81,7 +81,9 @@ single **"Start Private Flow"** button — no Google / Microsoft / email / SSO b
 
 > Note: the on-disk cache folder is still named `.cache\openwhispr\` on purpose — renaming it
 > would orphan models you've already downloaded. It is a local path only; nothing about it
-> reaches the OpenWhispr service. Migrating this folder name is a possible future cleanup.
+> reaches the OpenWhispr service. An opt-in, non-destructive migration to
+> `.cache\private-flow\` is available via `npm run assets:migrate-cache -- --apply`
+> (see [docs/forever-build.md](docs/forever-build.md) §6).
 
 ---
 
@@ -116,13 +118,26 @@ replace this private fork with the original product. It stays off.
 - Identity set to Private Flow (`private-flow`, `local.privateflow.desktop`, `PrivateFlow`
   userData, "Private Flow" product/installer names).
 
+## Forever build (self-hosted assets)
+
+Private Flow can be rebuilt/reinstalled forever without depending on OpenWhispr releases.
+See [docs/forever-build.md](docs/forever-build.md) and
+[docs/third-party-assets.md](docs/third-party-assets.md).
+
+- `npm run assets:audit` — list required/optional assets and local status
+- `npm run assets:bundle` — build a fully-offline bundle under `artifacts/` (git-ignored)
+- `npm run assets:verify` — checksum-verify the bundle
+- `npm run assets:print-upload-list` — files to mirror to your own GitHub Release
+- `npm run setup:offline` — install from the offline bundle (no internet)
+
+Build-time downloads now prefer your offline bundle / `PRIVATE_FLOW_ASSET_BASE_URL` and
+**never silently fall back to OpenWhispr-owned releases** (gated behind
+`ALLOW_UPSTREAM_ASSET_FALLBACK=true`).
+
 ## Still pending (not required to run in dev)
 
 These are build/attribution items, not runtime dependencies — see the delivery report:
 
-- Build-time download scripts in `scripts/` still fetch native helper binaries from the
-  `OpenWhispr/openwhispr` GitHub releases. Needed to *build*; not used at runtime. For a
-  fully self-hosted "forever" build, mirror these binaries and repoint the scripts.
 - A few secondary/dormant identifiers remain internal-only (OAuth `openwhispr://` scheme,
   D-Bus `com.openwhispr.App`, `OPENWHISPR_*` env var names, cloud/CLI/MCP/share URLs that are
   only reachable if you opt into cloud).

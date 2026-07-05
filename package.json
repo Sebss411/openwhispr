@@ -8,6 +8,9 @@
   "engines": {
     "node": ">=24"
   },
+  "privateFlow": {
+    "assetBaseUrl": ""
+  },
   "scripts": {
     "compile:globe": "node scripts/build-globe-listener.js",
     "compile:fast-paste": "node scripts/build-macos-fast-paste.js",
@@ -50,6 +53,12 @@
     "predist": "npm run compile:native && npm run download:whisper-cpp && npm run download:llama-server && npm run download:sherpa-onnx && npm run download:qdrant && npm run download:meeting-aec-helper && npm run download:whisper-vad-model && npm run download:diarization-models -- --output-dir resources/bin/diarization-models",
     "dist": "npm run build:renderer && electron-builder",
     "setup:local": "npm run download:local-whisper && npm run download:local-model",
+    "setup:offline": "node scripts/setup-offline.js",
+    "assets:audit": "node scripts/assets-audit.js",
+    "assets:bundle": "node scripts/assets-bundle.js",
+    "assets:verify": "node scripts/assets-verify.js",
+    "assets:print-upload-list": "node scripts/assets-print-upload-list.js",
+    "assets:migrate-cache": "node scripts/assets-migrate-cache.js",
     "serve:mobile": "node scripts/mobile-whisper-server.js",
     "download:local-whisper": "node scripts/download-whisper-cpp.js --current",
     "download:local-model": "node scripts/download-whisper-model.js",
