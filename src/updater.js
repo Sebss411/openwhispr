@@ -1,5 +1,10 @@
 const { autoUpdater } = require("electron-updater");
 
+// Private local build: auto-updates are disabled. The upstream feed points at
+// the public OpenWhispr GitHub releases, so updating would replace this fork
+// with the original product.
+const UPDATES_DISABLED = true;
+
 class UpdateManager {
   constructor() {
     this.mainWindow = null;
@@ -27,7 +32,7 @@ class UpdateManager {
   }
 
   setupAutoUpdater() {
-    if (process.env.NODE_ENV === "development") {
+    if (UPDATES_DISABLED || process.env.NODE_ENV === "development") {
       return;
     }
 
@@ -159,6 +164,12 @@ class UpdateManager {
 
   async checkForUpdates() {
     try {
+      if (UPDATES_DISABLED) {
+        return {
+          updateAvailable: false,
+          message: "Updates are disabled in this private build",
+        };
+      }
       if (process.env.NODE_ENV === "development") {
         return {
           updateAvailable: false,
@@ -307,6 +318,9 @@ class UpdateManager {
   }
 
   checkForUpdatesOnStartup() {
+    if (UPDATES_DISABLED) {
+      return;
+    }
     if (process.env.NODE_ENV !== "development") {
       setTimeout(() => {
         console.log("🔄 Checking for updates on startup...");

@@ -1,9 +1,9 @@
 {
-  "appId": "com.gizmolabs.openwhispr",
+  "appId": "local.privateflow.desktop",
   "afterPack": "scripts/afterPack.js",
-  "productName": "OpenWhispr",
+  "productName": "Private Flow",
   "protocols": {
-    "name": "OpenWhispr Protocol",
+    "name": "Private Flow Protocol",
     "schemes": ["openwhispr"]
   },
   "directories": {
@@ -147,9 +147,9 @@
     "extendInfo": {
       "LSUIElement": false,
       "CFBundleIconName": "openwhispr",
-      "NSMicrophoneUsageDescription": "OpenWhispr uses the microphone to capture your voice for transcription.",
-      "NSAudioCaptureUsageDescription": "OpenWhispr uses system audio to capture other participants' audio from calls and meetings.",
-      "NSAccessibilityUsageDescription": "OpenWhispr needs accessibility permissions to paste transcribed text into other applications."
+      "NSMicrophoneUsageDescription": "Private Flow uses the microphone to capture your voice for transcription.",
+      "NSAudioCaptureUsageDescription": "Private Flow uses system audio to capture other participants' audio from calls and meetings.",
+      "NSAccessibilityUsageDescription": "Private Flow needs accessibility permissions to paste transcribed text into other applications."
     }
   },
   "win": {
@@ -242,18 +242,11 @@
     "include": "resources/nsis/cleanup-models.nsh"
   },
   "dmg": {
-    "title": "OpenWhispr",
+    "title": "Private Flow",
     "icon": "src/assets/icon.icns",
     "window": {
       "width": 540,
       "height": 380
     }
-  },
-  "publish": {
-    "provider": "github",
-    "owner": "OpenWhispr",
-    "repo": "openwhispr",
-    "private": false,
-    "releaseType": "draft"
   }
 }
