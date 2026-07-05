@@ -5,12 +5,12 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-        android:label="OpenWhispr Keyboard"
+        android:label="Private Flow Keyboard"
         android:usesCleartextTraffic="true">
 
         <service
             android:name=".OpenWhisprImeService"
-            android:label="OpenWhispr Voice Keyboard"
+            android:label="Private Flow Voice Keyboard"
             android:permission="android.permission.BIND_INPUT_METHOD"
             android:exported="true">
             <intent-filter>
@@ -23,7 +23,7 @@
 
         <activity
             android:name=".SettingsActivity"
-            android:label="OpenWhispr Keyboard Settings"
+            android:label="Private Flow Keyboard Settings"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

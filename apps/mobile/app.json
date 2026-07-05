@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "OpenWhispr Mobile",
-    "slug": "openwhispr-mobile",
+    "name": "Private Flow Mobile",
+    "slug": "private-flow-mobile",
     "version": "0.1.0",
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
@@ -13,7 +13,7 @@
       }
     },
     "android": {
-      "package": "com.openwhispr.mobile",
+      "package": "local.privateflow.mobile",
       "permissions": ["android.permission.RECORD_AUDIO"],
       "usesCleartextTraffic": true
     },
@@ -21,7 +21,7 @@
       [
         "expo-audio",
         {
-          "microphonePermission": "Allow OpenWhispr to record dictation. Audio is transcribed on your own computer and never leaves your devices."
+          "microphonePermission": "Allow Private Flow to record dictation. Audio is transcribed on your own computer and never leaves your devices."
         }
       ]
     ]

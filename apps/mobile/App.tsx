@@ -1,4 +1,4 @@
-// OpenWhispr Mobile MVP — record, transcribe on your own computer over LAN,
+// Private Flow Mobile MVP — record, transcribe on your own computer over LAN,
 // clean up with the shared offline pipeline, copy/share, local history.
 // Requires the desktop bridge running: `npm run serve:mobile` in the repo root.
 import React, { useCallback, useEffect, useMemo, useState } from "react";
@@ -129,7 +129,7 @@ export default function App() {
     <SafeAreaView style={styles.root}>
       <StatusBar style="auto" />
       <View style={styles.header}>
-        <Text style={styles.title}>OpenWhispr</Text>
+        <Text style={styles.title}>Private Flow</Text>
         <Pressable onPress={() => setShowSettings((v) => !v)}>
           <Text style={styles.link}>{showSettings ? "Done" : "Settings"}</Text>
         </Pressable>

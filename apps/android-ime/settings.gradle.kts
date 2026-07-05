@@ -11,5 +11,5 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-rootProject.name = "openwhispr-ime"
+rootProject.name = "private-flow-ime"
 include(":app")

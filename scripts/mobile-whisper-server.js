@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// LAN transcription bridge for the mobile app / Android IME.
+// Private Flow Mobile Bridge — LAN transcription bridge for the mobile app / Android IME.
 //
 // The desktop app's whisper-server binds to 127.0.0.1 on purpose; this
 // opt-in script reuses the same binary and downloaded models to expose a
@@ -207,7 +207,7 @@ async function main() {
       .flat()
       .filter((n) => n && n.family === "IPv4" && !n.internal)
       .map((n) => n.address);
-    console.log(`\n[bridge] listening on port ${PORT} (model: ${MODEL_NAME})`);
+    console.log(`\n[bridge] Private Flow Mobile Bridge listening on port ${PORT} (model: ${MODEL_NAME})`);
     for (const ip of ips) console.log(`[bridge]   phone URL: http://${ip}:${PORT}`);
     if (!TOKEN) {
       console.log("[bridge] WARNING: no --token set — anyone on your network can transcribe. Home LAN only.");

@@ -8,7 +8,9 @@ android {
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.openwhispr.ime"
+        // Installed package id for Private Flow Keyboard. The code namespace stays
+        // com.openwhispr.ime (fork source layout) to avoid moving Kotlin sources.
+        applicationId = "local.privateflow.keyboard"
         minSdk = 26
         targetSdk = 35
         versionCode = 1
