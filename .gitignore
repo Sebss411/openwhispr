@@ -195,6 +195,12 @@ native/meeting-aec-helper/third_party/
 
 # Private Flow offline bundle (local build artifacts — binaries + models, never committed)
 artifacts/
+# Heavy asset types — defense-in-depth so binaries/models never enter git even
+# outside resources/bin/ or artifacts/ (source dirs above are already ignored).
+*.bin
+*.onnx
+*.zip
+*.7z
 
 # macOS
 .DS_Store

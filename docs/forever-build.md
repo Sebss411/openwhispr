@@ -60,8 +60,14 @@ snapshot with sha256 is written to `private-flow-assets.manifest.json` by
 qdrant, whisper-vad model, a Whisper GGML model (`ggml-base.bin`), and the
 all-MiniLM-L6-v2 embedding model. **Optional (graceful fallback):**
 meeting-aec-helper, windows-key-listener, windows-fast-paste,
-windows-mic-listener, windows-text-monitor, nircmd, small/large Whisper models,
-diarization models.
+windows-mic-listener, windows-text-monitor, nircmd, `ggml-small.bin` (and larger)
+Whisper models, diarization models.
+
+**Recommended minimum bundle:** the offline bundle ships **both** `ggml-base.bin`
+(~142 MB, the default) and `ggml-small.bin` (~466 MB, higher accuracy) so a clean
+install can pick either without any download. Larger models (`medium`, `large`,
+`turbo`) are deliberately **not** bundled — pull them on demand with
+`npm run download:local-model -- --model <name>` if you want them.
 
 **OpenWhispr-owned (mirror these first):** `whisper-server` (from
 `OpenWhispr/whisper.cpp`) and all the Windows helper binaries (from
@@ -80,9 +86,17 @@ npm run assets:verify     # recomputes and checks every sha256
 ```
 
 The bundle contains the **extracted, ready-to-run** `resources/bin` (with every
-sibling DLL) plus the model files, `manifest.json`, `checksums.sha256`, and a
-`README.md`. It is git-ignored. Copy the folder to a USB drive / backup for
-"forever" safekeeping.
+sibling DLL) plus the model files (`ggml-base.bin` **and** `ggml-small.bin`, the
+MiniLM embedding model, diarization models), `manifest.json`, `checksums.sha256`,
+and a `README.md`. It is git-ignored. Copy the folder to a USB drive / backup for
+"forever" safekeeping. A full Windows x64 bundle with both Whisper models is
+~900 MB.
+
+> **Never commit the bundle or any heavy asset.** `artifacts/` and `resources/bin/`
+> are git-ignored directories, and `.gitignore` also blocks `*.exe`, `*.bin`,
+> `*.onnx`, `*.zip`, `*.7z` as defense-in-depth. Commit only source, docs,
+> `package.json`, `.gitignore`, and `private-flow-assets.manifest.json` (the
+> resolved manifest is small text and safe to track).
 
 ---
 
@@ -106,7 +120,7 @@ it. Then, **manually**:
 4. Configure the base URL:
 
    ```bash
-   export PRIVATE_FLOW_ASSET_BASE_URL=https://github.com/<you>/<fork>/releases/download/private-flow-assets-v1
+   export PRIVATE_FLOW_ASSET_BASE_URL=https://github.com/<owner>/<repo>/releases/download/private-flow-assets-v1
    # or set package.json → privateFlow.assetBaseUrl
    ```
 
@@ -121,7 +135,7 @@ Now `npm run prebuild:win` pulls from your release first.
 
 ### Case A — online, your own release
 ```bash
-export PRIVATE_FLOW_ASSET_BASE_URL=https://github.com/<you>/<fork>/releases/download/private-flow-assets-v1
+export PRIVATE_FLOW_ASSET_BASE_URL=https://github.com/<owner>/<repo>/releases/download/private-flow-assets-v1
 npm run setup:local     # whisper-server + base model
 npm run dev
 ```

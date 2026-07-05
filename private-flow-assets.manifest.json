@@ -1,7 +1,7 @@
 {
   "version": 1,
   "appName": "Private Flow",
-  "generatedAt": "2026-07-05T13:26:09.277Z",
+  "generatedAt": "2026-07-05T13:45:28.558Z",
   "assetBaseUrlPlaceholder": "https://github.com/<owner>/<repo>/releases/download/private-flow-assets-v1",
   "assets": [
     {
@@ -220,9 +220,9 @@
       "releaseFileName": "ggml-small.bin",
       "upstreamUrl": "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-small.bin",
       "privateFlowReleaseUrl": "https://github.com/<owner>/<repo>/releases/download/private-flow-assets-v1/ggml-small.bin",
-      "present": false,
-      "sizeBytes": null,
-      "sha256": null,
+      "present": true,
+      "sizeBytes": 487601967,
+      "sha256": "1be3a9b2063867b937e64e2ec7483364a79917e157fa98c5d94b5c1fffea987b",
       "notes": "Higher-accuracy model (~466 MB). Optional. Get it with: npm run download:local-model -- --model small"
     },
     {
