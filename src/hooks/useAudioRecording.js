@@ -199,7 +199,7 @@ export const useAudioRecording = (toast, options = {}) => {
     // Cloud STT config is only relevant outside local mode; skip the IPC round-trip
     // (and the resulting "API URL not configured" noise) on local-only installs.
     if (!getSettings().useLocalWhisper) {
-      window.electronAPI.getSttConfig?.().then((config) => {
+      window.electronAPI?.getSttConfig?.().then((config) => {
         if (config?.success && audioManagerRef.current) {
           audioManagerRef.current.setSttConfig(config);
           if (audioManagerRef.current.shouldUseStreaming()) {
@@ -231,7 +231,11 @@ export const useAudioRecording = (toast, options = {}) => {
       await performStopRecording();
     };
 
-    const disposeToggle = window.electronAPI.onToggleDictation(() => {
+    // Defensive: the dictation overlay renders even while the preload bridge is
+    // still initializing (or absent in local-only/dev races). Missing listeners
+    // must degrade gracefully instead of crashing the whole window. See onboarding
+    // crash "Cannot read properties of undefined (reading 'onToggleDictation')".
+    const disposeToggle = window.electronAPI?.onToggleDictation?.(() => {
       handleToggle();
       onToggle?.();
     });

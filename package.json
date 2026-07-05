@@ -1,5 +1,5 @@
 {
-  "name": "open-whispr",
+  "name": "private-flow",
   "productName": "Private Flow",
   "version": "1.7.3",
   "description": "Private local desktop dictation app using whisper.cpp for speech-to-text transcription",

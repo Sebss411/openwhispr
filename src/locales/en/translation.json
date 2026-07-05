@@ -675,7 +675,7 @@
     }
   },
   "auth": {
-    "cloudNotConfigured": "Cloud Not Configured",
+    "cloudNotConfigured": "Runs locally on this device. No account or internet required.",
     "common": {
       "back": "Back",
       "continue": "Continue",
@@ -697,7 +697,7 @@
       "invalidCredentials": "Invalid email or password",
       "plusAliasUnsupported": "Email aliases with '+' are not supported"
     },
-    "getStarted": "Get Started",
+    "getStarted": "Start Private Flow",
     "legal": {
       "and": "and",
       "prefix": "By continuing, you agree to our",
@@ -1049,7 +1049,7 @@
       "reset": "Reset",
       "save": "Save"
     },
-    "defaultTestInput": "Hey Whispr, what's the weather like today?",
+    "defaultTestInput": "Hey Flow, what's the weather like today?",
     "dialogs": {
       "reset": {
         "description": "Prompt has been reset to the default value.",

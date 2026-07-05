@@ -3,22 +3,28 @@ import { ssoClient } from "@better-auth/sso/client";
 import { OPENWHISPR_API_URL } from "../config/constants";
 import { openExternalLink } from "../utils/externalLinks";
 
-export const AUTH_URL = import.meta.env.VITE_AUTH_URL || "https://auth.openwhispr.com";
-export const authClient = createAuthClient({
-  baseURL: AUTH_URL,
-  plugins: [ssoClient()],
-  fetchOptions: {
-    auth: {
-      type: "Bearer",
-      token: async () => (await window.electronAPI?.authGetToken?.()) ?? "",
-    },
-    headers: { "x-openwhispr-source": "desktop" },
-    onSuccess: async (ctx: { response: Response }) => {
-      const newToken = ctx.response.headers.get("set-auth-token");
-      if (newToken) await window.electronAPI?.authSetToken?.(newToken);
-    },
-  },
-});
+// Private Flow is local-first: cloud auth is OFF unless a workspace explicitly
+// opts in by setting VITE_AUTH_URL. With no URL, authClient is null and the whole
+// account/login experience (social, SSO, email, terms) is hidden — the app runs
+// fully offline with no account required.
+export const AUTH_URL = import.meta.env.VITE_AUTH_URL || "";
+export const authClient = AUTH_URL
+  ? createAuthClient({
+      baseURL: AUTH_URL,
+      plugins: [ssoClient()],
+      fetchOptions: {
+        auth: {
+          type: "Bearer",
+          token: async () => (await window.electronAPI?.authGetToken?.()) ?? "",
+        },
+        headers: { "x-openwhispr-source": "desktop" },
+        onSuccess: async (ctx: { response: Response }) => {
+          const newToken = ctx.response.headers.get("set-auth-token");
+          if (newToken) await window.electronAPI?.authSetToken?.(newToken);
+        },
+      },
+    })
+  : null;
 
 export type SocialProvider = "google" | "microsoft" | "apple";
 
@@ -131,7 +137,7 @@ export async function deleteAccount(): Promise<{ error?: Error }> {
 
 export async function signOut(): Promise<void> {
   try {
-    await authClient.signOut();
+    if (authClient) await authClient.signOut();
     if (window.electronAPI?.authClearSession) {
       await window.electronAPI.authClearSession();
     }
@@ -188,6 +194,7 @@ export async function signInWithSocial(provider: SocialProvider): Promise<{ erro
       return {};
     }
 
+    if (!authClient) return { error: new Error("Auth not configured") };
     const callbackURL = `${window.location.href.split("?")[0].split("#")[0]}?panel=true`;
     await authClient.signIn.social({ provider, callbackURL, newUserCallbackURL: callbackURL });
     return {};
@@ -212,6 +219,7 @@ export async function signInWithSSO(email: string): Promise<{ error?: Error }> {
       return {};
     }
 
+    if (!authClient) return { error: new Error("Auth not configured") };
     const callbackURL = `${window.location.href.split("?")[0].split("#")[0]}?panel=true`;
     await authClient.signIn.sso({ email, callbackURL });
     return {};
@@ -222,6 +230,7 @@ export async function signInWithSSO(email: string): Promise<{ error?: Error }> {
 
 export async function requestPasswordReset(email: string): Promise<{ error?: Error }> {
   try {
+    if (!authClient) return { error: new Error("Auth not configured") };
     await authClient.requestPasswordReset({
       email: email.trim(),
       redirectTo: "https://openwhispr.com/reset-password",

@@ -734,7 +734,7 @@ function startAuthBridgeServer() {
 
     res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
     res.end(
-      "<html><body><h3>OpenWhispr sign-in complete.</h3><p>You can close this tab.</p></body></html>"
+      "<html><body><h3>Private Flow sign-in complete.</h3><p>You can close this tab.</p></body></html>"
     );
   });
 
