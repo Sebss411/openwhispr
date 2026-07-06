@@ -188,3 +188,45 @@ installs keep working with zero migration.
   in the offline bundle (§3).
 
 See `docs/third-party-assets.md` for licenses and attribution.
+
+---
+
+## 8. Verifying the mirror path (`PRIVATE_FLOW_ASSET_BASE_URL`)
+
+The resolver (`scripts/lib/asset-source.js`) fetches each asset from
+`${PRIVATE_FLOW_ASSET_BASE_URL}/<name>`, where **`<name>` is the basename of the
+asset's original upstream URL** (`assetNameFromUrl`). So every file you upload to
+your release must be named **exactly** that basename — which is precisely what
+`assets:print-upload-list` and each manifest `releaseFileName` now report. Two
+assets have generic upstream basenames and must therefore be uploaded under those
+generic names, not a descriptive one:
+
+- MiniLM embedding model → **`model.onnx`** (upstream `.../onnx/model.onnx`)
+- MiniLM tokenizer → **`tokenizer.json`**
+
+If you rename them on upload, the resolver requests the generic name, 404s, and
+silently falls back to HuggingFace — your mirror copy becomes dead weight.
+
+Guarantees validated against a local HTTPS mirror standing in for the release
+(the same code path a real GitHub release uses):
+
+1. **Naming** — the filename the resolver requests equals the upload-list name for
+   all 17 assets.
+2. **Serving** — a real asset fetched from the mirror is byte-for-byte identical
+   (sha256) to the source; **OpenWhispr-owned assets are served from your mirror,
+   never from OpenWhispr**.
+3. **Fail-closed** — an OpenWhispr-owned asset with no bundle, no mirror, and
+   `ALLOW_UPSTREAM_ASSET_FALLBACK` unset throws `PRIVATE_FLOW_ASSET_MISSING`
+   (no silent upstream reach).
+4. **Precedence** — the offline bundle (§3) always wins over the mirror.
+
+**Upload readiness of a typical dev machine:** the direct-file assets
+(`ggml-base.bin`, `ggml-small.bin`, `model.onnx`, `tokenizer.json`,
+`ggml-silero-v5.1.2.bin`, the 3D-Speaker embedding) are the on-disk files
+themselves — upload them as-is. The archive assets (whisper-server, llama-server,
+sherpa-onnx, qdrant, nircmd, the Windows helpers, the diarization segmentation
+model) live on disk only as **extracted binaries**, so to populate those release
+entries you must re-obtain the **original archive** from its upstream (neutral
+ones are stable public URLs; the OpenWhispr-owned binaries you already possess are
+preserved forever in the offline bundle — the bundle path needs no archives at
+all).

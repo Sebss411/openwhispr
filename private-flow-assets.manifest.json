@@ -1,7 +1,7 @@
 {
   "version": 1,
   "appName": "Private Flow",
-  "generatedAt": "2026-07-05T13:45:28.558Z",
+  "generatedAt": "2026-07-05T23:36:23.088Z",
   "assetBaseUrlPlaceholder": "https://github.com/<owner>/<repo>/releases/download/private-flow-assets-v1",
   "assets": [
     {
@@ -234,9 +234,9 @@
       "openwhisprOwned": false,
       "localPath": "~/.cache/openwhispr/embedding-models/all-MiniLM-L6-v2/model.onnx",
       "bundleRelPath": "models/embedding-models/all-MiniLM-L6-v2/model.onnx",
-      "releaseFileName": "all-MiniLM-L6-v2-model.onnx",
+      "releaseFileName": "model.onnx",
       "upstreamUrl": "https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/onnx/model.onnx",
-      "privateFlowReleaseUrl": "https://github.com/<owner>/<repo>/releases/download/private-flow-assets-v1/all-MiniLM-L6-v2-model.onnx",
+      "privateFlowReleaseUrl": "https://github.com/<owner>/<repo>/releases/download/private-flow-assets-v1/model.onnx",
       "present": true,
       "sizeBytes": 90405214,
       "sha256": "6fd5d72fe4589f189f8ebc006442dbb529bb7ce38f8082112682524616046452",
@@ -251,9 +251,9 @@
       "openwhisprOwned": false,
       "localPath": "~/.cache/openwhispr/embedding-models/all-MiniLM-L6-v2/tokenizer.json",
       "bundleRelPath": "models/embedding-models/all-MiniLM-L6-v2/tokenizer.json",
-      "releaseFileName": "all-MiniLM-L6-v2-tokenizer.json",
+      "releaseFileName": "tokenizer.json",
       "upstreamUrl": "https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/tokenizer.json",
-      "privateFlowReleaseUrl": "https://github.com/<owner>/<repo>/releases/download/private-flow-assets-v1/all-MiniLM-L6-v2-tokenizer.json",
+      "privateFlowReleaseUrl": "https://github.com/<owner>/<repo>/releases/download/private-flow-assets-v1/tokenizer.json",
       "present": true,
       "sizeBytes": 466247,
       "sha256": "be50c3628f2bf5bb5e3a7f17b1f74611b2561a3a27eeab05e5aa30f411572037",

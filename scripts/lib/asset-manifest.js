@@ -223,7 +223,11 @@ const ASSETS = [
     owned: false,
     localPath: "~/.cache/openwhispr/embedding-models/all-MiniLM-L6-v2/model.onnx",
     bundleRelPath: "models/embedding-models/all-MiniLM-L6-v2/model.onnx",
-    releaseFileName: "all-MiniLM-L6-v2-model.onnx",
+    // MUST equal the upstream basename: the resolver (asset-source.js) fetches by
+    // assetNameFromUrl(upstreamUrl), i.e. "model.onnx". Upload it to your release
+    // under exactly this name or PRIVATE_FLOW_ASSET_BASE_URL 404s and silently
+    // falls back to HuggingFace.
+    releaseFileName: "model.onnx",
     upstreamUrl:
       "https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/onnx/model.onnx",
     notes: "Local text embeddings for semantic search (~90 MB).",
@@ -237,7 +241,8 @@ const ASSETS = [
     owned: false,
     localPath: "~/.cache/openwhispr/embedding-models/all-MiniLM-L6-v2/tokenizer.json",
     bundleRelPath: "models/embedding-models/all-MiniLM-L6-v2/tokenizer.json",
-    releaseFileName: "all-MiniLM-L6-v2-tokenizer.json",
+    // MUST equal the upstream basename ("tokenizer.json") — see model.onnx above.
+    releaseFileName: "tokenizer.json",
     upstreamUrl:
       "https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/tokenizer.json",
     notes: "Tokenizer for the MiniLM embedding model.",
